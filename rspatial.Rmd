@@ -1,0 +1,43 @@
+---
+title: "R Spatial"
+author: "Edzer Pebesma, @edzerpebesma"
+date: "Jun 20, 2019, foss4gnl, Delft [edzer.github.io/foss4gnl/](https://edzer.github.io/foss4gnl) ([rmd](https://github.com/edzer/jena/blob/master/rspatial.Rmd))"
+output: 
+  ioslides_presentation:
+    logo: logo.png
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## What is R?
+
+[r-project.org](https://www.r-project.org/): "R is a free software environment for statistical computing and graphics. It compiles and runs on a wide variety of UNIX platforms, Windows and MacOS."
+
+* high-level language, meant for interacting with data
+* implements a programming language (called S)
+* extensible through a packaging system
+* emphasises reproducibility: over time, and accross platforms
+* written in C, interfaces to Fortran, C, C++, Java, Python, ...
+
+## R: history
+
+* S was created by John Chambers in 1978, then at Bell Labs
+* (S-Plus was commercial, AT\&T, Lucent, Insightful, Tibco)
+* R was a research project, started in 1992 by Ross Ihaka and Robert Gentlemen from Univ. of Aucland, to re-implement S in Scheme
+* beta released in 2000, 
+* Most academic S-Plus contributors moved to R early 2000s
+* (now, Tibco sells [TERR](https://www.tibco.com/blog/2014/08/06/26509/), an alternatively licensed runtime compatible to R)
+
+## R Spatial: history
+
+* pre-2003: many spatial packages existed in S-Plus, including `spatstat`, `spdep`, `maptools`, `gstat`
+* 2003: R Spatial workshop set up by Roger Bivand, agreed on a need for a common set of classes and methods
+* 2005: `sp` released, used S4, `rgdal` (Tim Keitt/RB; links to GDAL, PROJ) followed
+* 2009: `rgeos` interface to GEOS (Colin Rundel/RB, GSOC)
+* 2010: `raster` for scalable raster analysis (Robert Hijmans)
+* 2016: `sf`, using S3, implementes simple features and links to `tidyverse`
+* 2018: `stars` for raster and vector data cubes
+
+## 
