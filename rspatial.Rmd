@@ -21,6 +21,19 @@ knitr::opts_chunk$set(echo = FALSE)
 * emphasises reproducibility: over time, and accross platforms
 * written in C, interfaces to Fortran, C, C++, Java, Python, ...
 
+## Why do people use R?
+
+I honestly don't know! But maybe:
+
+* to get stuff done, relatively quickly
+* to get everything done in one place
+* to do things reproducibly (= scripted)
+* to be able to easily share \& communicate what you did (Mac/Windows/Linux)
+* to become part of a data science community
+* but ... Python? See e.g. Norm Mattloff's [R vs Python for Data Science](https://github.com/matloff/R-vs.-Python-for-Data-Science)
+* doing stuff reproducibly is more important than whether you use R or Python, and the two languages integrate well
+* competition encourages ecosystem competition
+
 ## R: history
 
 * S was created by John Chambers in 1978, then at Bell Labs
@@ -38,6 +51,51 @@ knitr::opts_chunk$set(echo = FALSE)
 * 2009: `rgeos` interface to GEOS (Colin Rundel/RB, GSOC)
 * 2010: `raster` for scalable raster analysis (Robert Hijmans)
 * 2016: `sf`, using S3, implementes simple features and links to `tidyverse`
-* 2018: `stars` for raster and vector data cubes
+* 2018: `stars` for raster and vector data cubes (spatiotemporal, array data)
 
-## 
+----
+
+2017:
+```{r, out.width='90%', fig.align='center'}
+knitr::include_graphics('spverse.png')
+```
+
+---
+
+```{r, out.width='90%', fig.align='center'}
+knitr::include_graphics('sf.jpg')
+```
+(c) @allison_horst
+
+## Simple Feature Access
+
+Package `sf` "implements" simple feature access (SFA, OGC 06-103r4), but this leaves a lot open: e.g. how to handle
+
+* geometry generating functions, e.g. `st_union` on two tables (pairs of sets)
+* operations using geodetic (long/lat) coordinates: what are X/Y/Z?
+* the (self-inflicted) axis order mess
+* how do attributes relate to geometries, and how does this affect queries involving geometry _and_ attributes?
+
+## sf has _attribute-geometry relationships_
+
+```{r, out.width='50%', fig.align='center'}
+knitr::include_graphics('landuse.png')
+```
+
+_attribute-geometry relationship_ values:
+
+* `constant`: values is valid everywhere throughout the geometry
+* `aggregate`: value is an aggregation _over_ the geometry
+* `identity`: value is `constant` _and_ unique
+
+```{r echo=TRUE}
+library(sf)
+```
+
+---
+
+```{r echo=TRUE}
+nc = read_sf(system.file("gpkg/nc.gpkg", package="sf"))
+pt = st_sfc(st_point(c(-81.18642, 36.15643)), crs = st_crs(nc))
+st_intersection(nc["SID74"], pt) 
+```
