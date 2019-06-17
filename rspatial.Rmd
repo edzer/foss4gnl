@@ -1,7 +1,7 @@
 ---
 title: "R Spatial"
 author: "Edzer Pebesma, @edzerpebesma"
-date: "Jun 20, 2019, foss4gnl, Delft [edzer.github.io/foss4gnl/](https://edzer.github.io/foss4gnl) ([rmd](https://github.com/edzer/jena/blob/master/rspatial.Rmd))"
+date: "Jun 20, 2019, foss4gnl, Delft [edzer.github.io/foss4gnl/](https://edzer.github.io/foss4gnl) ([rmd](https://github.com/edzer/foss4gnl/blob/master/rspatial.Rmd))"
 output: 
   ioslides_presentation:
     logo: logo.png
