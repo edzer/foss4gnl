@@ -4,15 +4,12 @@ author: "Edzer Pebesma, @edzerpebesma"
 date: "Jun 20, 2019, foss4gnl, Delft [edzer.github.io/foss4gnl/](https://edzer.github.io/foss4gnl) ([rmd](https://github.com/edzer/foss4gnl/blob/master/rspatial.Rmd))"
 output: 
   ioslides_presentation:
+    css: rspatial.css
     logo: logo.png
     widescreen: true
     smaller: true
 ---
 
-.fullslide img {
-  margin-top: -85px;
-  margin-left: -60px;
-}
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
@@ -301,6 +298,36 @@ ndvi = function(x) (x[4]-x[3])/(x[4]+x[3])
 system.time(plot(st_apply(p, c("x", "y"), ndvi)))
 ```
 
+## OSGEO - R
+
+```{r, out.width='90%', fig.align='center'}
+knitr::include_graphics('sf_deps.png')
+```
+
+---
+
+**This annoys me:**
+```{r echo=TRUE}
+wgs84 = "+proj=longlat +datum=WGS84"
+st_linestring(rbind(c(-179,50), c(179,50))) %>%
+	st_sfc(crs = wgs84) %>%
+	st_bbox
+```
+and this too:
+```{r echo=TRUE}
+list(rbind(c(0,66), c(-120,66), c(120,66), c(0,66))) %>%
+	st_polygon() %>% st_sfc(crs = wgs84) -> polar_circle
+st_point(c(0,90)) %>% st_sfc(crs = wgs84) -> north_pole
+st_intersects(polar_circle, north_pole)
+```
+
+## R global
+
+* is an upcoming activity, to handle spherical data, well, as spherical data.
+* will have to reconsider the bounding box concept
+* will help plotting e.g. orthographic maps
+* will use Google's [s2geometry.io](https://s2geometry.io) library, which also powers G Maps, G Earth, G Earth Engine and G Bigquery GIS
+
 ----
 
 **OGC**:
@@ -308,36 +335,38 @@ system.time(plot(st_apply(p, c("x", "y"), ndvi)))
 knitr::include_graphics('wecandoit.jpg')
 ```
 
-----
+## {.fullslide}
 
-```{r, out.height='70%', fig.align='center'}
-knitr::include_graphics('alpha.jpg')
-```
+![](alpha2.jpg)
 
 
 
-## OSGEO, R, software standards, culture
+## OSGEO, R, open software standards, culture
 
 * Nobody in the entire R community talks about (open) standards.
+* Being **open** doesn't make a standard **good**:
 * Good standards follow (or _fix_) open source implementations (geo: WMS, SOS, GPKG, SFA). So that it works, and the world gets better.
-* Bad standards don't, but introduce complexity and/or software or platform lock-in
-* OGC _should_ only produce good standards, but _can't_, because its organisational (closed, membership levels) model allows strong partners to push for software or platform lock-in: plutocracy.
-* It also evolves standards, which breaks things, and intentionally introduces complexity, like axis order.
+* Bad standards don't follow open source implementations, but introduce complexity and/or software or platform lock-in
+* OGC _should_ only produce good standards, but _can't_, because its organisational model (closed, membership levels) allows strong partners to push for software or platform lock-ins: plutocracy
+* OGC also _evolves_ standards, which breaks things, and introduces complexity (axis order: anyone?)
+* When will OGC start abandoning standards, and simplify others?
 
 What to do?
 
 > - Keep away from the bad standards, and create good (software) alternatives
 > - Don't accept that OGC plays your game: look at [STAC](https://stacspec.org/), [WFS-3](https://github.com/opengeospatial/WFS_FES), [openEO](https://openeo.org/), [CityJSON](https://www.cityjson.org/), ...
-> - True innovation comes from open source implementations, not from starting to write a standards document!
+> - Innovate through open source implementations, not from starting to write a standards document!
 
 ## Concluding
 
-- R has a rich, evolving ecosystem of packages for spatial data science
-- As usual: get involved, on [github.com/r-spatial](https://github.com/r-spatial/) or [r-spatial.org](https://www.r-spatial.org/)
+- R has a rich, evolving ecosystem of packages for spatial data science, largely reusing OSGEO components
+- healthy competition: quality follows from (re-)use
+- Data cubes include vector data cubes, and are not constrained to raster/imagery data
+- Get involved, on [github.com/r-spatial](https://github.com/r-spatial/) or [r-spatial.org](https://www.r-spatial.org/)
 - **Spatial Data Science with R** is an upcoming book, written online: [r-spatial.org/book](https://www.r-spatial.org/book/)
 - Remember that as opposed to paper documents, only software actually works, and
 - Innovate by writing software, don't look back, and
-- Don't let anyone play that standards game with you!
+- Don't let anyone tell you to use standards nobody uses!
 
 
 [edzer.github.io/foss4gnl/](https://edzer.github.io/foss4gnl)
