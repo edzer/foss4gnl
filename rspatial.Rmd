@@ -5,7 +5,14 @@ date: "Jun 20, 2019, foss4gnl, Delft [edzer.github.io/foss4gnl/](https://edzer.g
 output: 
   ioslides_presentation:
     logo: logo.png
+    widescreen: true
+    smaller: true
 ---
+
+.fullslide img {
+  margin-top: -85px;
+  margin-left: -60px;
+}
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
@@ -99,3 +106,240 @@ nc = read_sf(system.file("gpkg/nc.gpkg", package="sf"))
 pt = st_sfc(st_point(c(-81.18642, 36.15643)), crs = st_crs(nc))
 st_intersection(nc["SID74"], pt) 
 ```
+
+## What are data cubes?
+
+- They are annotated **array data**.
+- Arrays map from $n$ dimensions to $p$ attributes:
+$$(D_1,D_2,...,D_n)\rightarrow (A_1,A_2,...,A_p)$$
+- array dimensions are enumerated sets, and may
+    - represent a set of entities (cities, persons, species, spectral bands)
+    - discretize a continuous variable, such as
+        - spatial _dimension_,
+        - time,
+        - time-of-day,
+        - frequency or wavelength,
+        - duration (e.g., time-to-forecast)
+
+## "Cube": 
+
+We use the word _cube_ short for
+
+- "real" cube: three dimensions
+- more than three dimensions: hypercube
+- two dimensions: matrix, raster
+
+a special case is:
+
+- one dimensional cube: table with records (`data.frame`, `tibble`)
+
+## "Spatial" data cube
+
+Cube dimensions can refer to spatial dimensions in several ways:
+
+- each continuous spatial dimension (x, y, z) maps to a **single** cube dimension (**raster** data cubes), e.g. regular grids
+   - $c(i) = o + (i-1) \times \delta, \ \ i = 1,2,...,n$
+   - index space is continuous: integer $i$ implies $[i,i+1)$
+   - this means that every coordinate value maps to a unique index (unlike polygons)
+
+- **all** spatial dimensions map to a single cube dimension (**vector** data cubes)
+    - cube dimension is a set of points/lines/polygons
+
+- combinations of these: e.g. origin-destination matrices
+
+----
+
+```{r,out.width='100%'}
+knitr::include_graphics('cube1.png')
+```
+
+----
+
+```{r,out.width='100%'}
+knitr::include_graphics('cube2.png')
+```
+
+----
+
+```{r,out.width='100%'}
+knitr::include_graphics('cube3.png')
+```
+
+----
+
+```{r,out.width='100%'}
+knitr::include_graphics('cube4.png')
+```
+
+## Raster - vector conversion
+
+From raster to vector:
+
+- polygons or points are given:
+    - sample ("extract")
+    - aggregate, e.g. mean or sum over polygon
+- polygons or lines are the result:
+    - polygonize
+    - contour
+
+From vector to raster:
+
+- (points/polygons:) rasterize
+- (point sample:) interpolate
+- (point pattern:) density
+
+## Raster types
+
+```{r echo=FALSE}
+suppressPackageStartupMessages(library(stars))
+suppressPackageStartupMessages(library(ggplot2))
+x = 1:5
+y = 1:4
+d = st_dimensions(x = x, y = y, .raster = c("x", "y"))
+m = matrix(runif(20),5,4)
+r1 = st_as_stars(r = m, dimensions = d)
+
+r = attr(d, "raster")
+r$affine = c(0.2, -0.2)
+attr(d, "raster") = r
+r2 = st_as_stars(r = m, dimensions = d)
+
+r = attr(d, "raster")
+r$affine = c(0.1, -0.3)
+attr(d, "raster") = r
+r3 = st_as_stars(r = m, dimensions = d)
+
+x = c(1, 2, 3.5, 5, 6)
+y = c(1, 1.5, 3, 3.5)
+d = st_dimensions(x = x, y = y, .raster = c("x", "y"))
+r4 = st_as_stars(r = m, dimensions = d)
+
+grd = st_make_grid(cellsize = c(10,10), offset = c(-130,10), n= c(8,5), crs=st_crs(4326))
+r5 = st_transform(grd, "+proj=laea +lon_0=-70 +lat_0=35")
+par(mfrow = c(2,3))
+r1 = st_make_grid(cellsize = c(1,1), n = c(5,4), offset = c(0,0))
+plot(r1, main = "regular")
+plot(st_geometry(st_as_sf(r2)), main = "rotated")
+plot(st_geometry(st_as_sf(r3)), main = "sheared")
+plot(st_geometry(st_as_sf(r4, as_points = FALSE)), main = "rectilinear")
+plot(st_geometry((r5)), main = "curvilinear")
+```
+
+## R package `stars`
+
+- a `stars` object is a _set_ (`list`) of arrays with possibly varying type (numeric, integer, `factor`, `logical`, `character`, `list`)
+- uses R's native arrays for that: all `array` Ops work (pixel math)
+- supports arrays with measurement units and time stamps (throug GDAL, libnetcdf)
+- has a `dimensions` attribute "table"
+- does everything in memory, unless you use `stars_proxy`, which does nothing in memory
+- lets you define arbitrary number of dimensions
+- slice \& dice with `[`, or `filter`
+- map/reduce with `st_apply`: apply a function to a (set of) dimension(s)
+- `aggregate` for spatial / temporal aggregations
+- supports rectilinear (all dims), rotated, sheared, and curvilinear grids (raster), and simple features (vector)
+
+## R package `stars` (2)
+
+- implements raster (GDAL, netcdf) and vector (`sfc`) data cubes
+- full support for PROJ coordinate reference systems
+- time support: `POSIXct`, `Date`, as well as `PCICt` (360, 365, noleap)
+- integration with some tidyverse verbs (`filter`, `select`, `mutate`, `geom_stars`)
+- integrates with `gstat` (spatial, spatiotemporal geostatistics)
+
+----
+
+```{r echo=TRUE}
+library(stars)
+tif = system.file("tif/L7_ETMs.tif", package = "stars")
+(x = read_stars(tif))
+```
+
+----
+
+```{r echo=TRUE}
+plot(x)
+```
+
+---
+
+```{r echo=TRUE}
+library(stars)
+library(ggplot2)
+ggplot() + geom_stars(data = x) + coord_equal() + facet_wrap(~band) +
+  theme_void()  +  scale_x_discrete(expand=c(0,0)) + scale_y_discrete(expand=c(0,0))
+```
+
+
+## `stars_proxy` objects
+
+- contain pointers to the data (file, URL), which by no means uniquely defines an array
+- use a strategy to go through them (chunking: currently only spatial)
+- are lazy: only compute when data is requested
+- can read downsampled arrays (e.g. to `plot`): optimises execution order of call stack
+- can time-compose e.g. a time stack of NetCDF files, with a time slice in each file
+
+---
+
+```{r echo=TRUE}
+granule = system.file("sentinel/S2A_MSIL1C_20180220T105051_N0206_R051_T32ULE_20180221T134037.zip", package = "starsdata")
+base_name = strsplit(basename(granule), ".zip")[[1]]
+s2 = paste0("SENTINEL2_L1C:/vsizip/", granule, "/", base_name, ".SAFE/MTD_MSIL1C.xml:10m:EPSG_32632")
+(p = read_stars(s2, proxy = TRUE))
+object.size(p)
+```
+
+---
+
+```{r echo=TRUE}
+system.time(plot(p))
+```
+
+---
+
+```{r echo=TRUE}
+ndvi = function(x) (x[4]-x[3])/(x[4]+x[3])
+system.time(plot(st_apply(p, c("x", "y"), ndvi)))
+```
+
+----
+
+**OGC**:
+```{r, out.height='90%', fig.align='center'}
+knitr::include_graphics('wecandoit.jpg')
+```
+
+----
+
+```{r, out.height='70%', fig.align='center'}
+knitr::include_graphics('alpha.jpg')
+```
+
+
+
+## OSGEO, R, software standards, culture
+
+* Nobody in the entire R community talks about (open) standards.
+* Good standards follow (or _fix_) open source implementations (geo: WMS, SOS, GPKG, SFA). So that it works, and the world gets better.
+* Bad standards don't, but introduce complexity and/or software or platform lock-in
+* OGC _should_ only produce good standards, but _can't_, because its organisational (closed, membership levels) model allows strong partners to push for software or platform lock-in: plutocracy.
+* It also evolves standards, which breaks things, and intentionally introduces complexity, like axis order.
+
+What to do?
+
+> - Keep away from the bad standards, and create good (software) alternatives
+> - Don't accept that OGC plays your game: look at [STAC](https://stacspec.org/), [WFS-3](https://github.com/opengeospatial/WFS_FES), [openEO](https://openeo.org/), [CityJSON](https://www.cityjson.org/), ...
+> - True innovation comes from open source implementations, not from starting to write a standards document!
+
+## Concluding
+
+- R has a rich, evolving ecosystem of packages for spatial data science
+- As usual: get involved, on [github.com/r-spatial](https://github.com/r-spatial/) or [r-spatial.org](https://www.r-spatial.org/)
+- **Spatial Data Science with R** is an upcoming book, written online: [r-spatial.org/book](https://www.r-spatial.org/book/)
+- Remember that as opposed to paper documents, only software actually works, and
+- Innovate by writing software, don't look back, and
+- Don't let anyone play that standards game with you!
+
+
+[edzer.github.io/foss4gnl/](https://edzer.github.io/foss4gnl)
+
+@edzerpebesma 
