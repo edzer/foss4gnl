@@ -366,8 +366,8 @@ What to do?
 - **Spatial Data Science with R** is an upcoming book, written online: [r-spatial.org/book](https://www.r-spatial.org/book/)
 - Remember that as opposed to paper documents, only software actually works, and
 - Innovate by writing software, don't look back, and
-- Always challenge those who tell you what your foundations are
-- We need to bring up the discussion about what _standards lock-in_ means
+- Always challenge those who try to tell you what your foundations are
+- We need to bring up the discussion about what **standards lock-in** means
 
 
 [edzer.github.io/foss4gnl/](https://edzer.github.io/foss4gnl)
