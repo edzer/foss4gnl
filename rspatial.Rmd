@@ -30,13 +30,13 @@ knitr::opts_chunk$set(echo = FALSE)
 I honestly don't know! But maybe:
 
 * to get stuff done, relatively quickly
-* to get everything done in one place
+* to get everything done in one place (=interoperability)
 * to do things reproducibly (= scripted)
 * to be able to easily share \& communicate what you did (Mac/Windows/Linux)
 * to become part of a data science community
 * but ... Python? See e.g. Norm Mattloff's [R vs Python for Data Science](https://github.com/matloff/R-vs.-Python-for-Data-Science)
 * doing stuff reproducibly is more important than whether you use R or Python, and the two languages integrate well
-* competition encourages ecosystem competition
+* competition encourages ecosystem evolution
 
 ## R: history
 
@@ -366,7 +366,8 @@ What to do?
 - **Spatial Data Science with R** is an upcoming book, written online: [r-spatial.org/book](https://www.r-spatial.org/book/)
 - Remember that as opposed to paper documents, only software actually works, and
 - Innovate by writing software, don't look back, and
-- Don't let anyone tell you to use standards nobody uses!
+- Always challenge those who tell you what your foundations are
+- We need to bring up the discussion about what _standards lock-in_ means
 
 
 [edzer.github.io/foss4gnl/](https://edzer.github.io/foss4gnl)
